@@ -1,0 +1,15 @@
+{
+  "dependencies": {
+    "@graphql-tools/merge": "^9.0.12",
+    "@graphql-tools/schema": "^10.0.11",
+    "@graphql-tools/stitch": "^9.4.9",
+    "bcrypt": "^5.1.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "graphql": "^16.9.0",
+    "graphql-http": "^1.22.3",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.4",
+    "ruru": "^2.0.0-beta.17"
+  }
+}
