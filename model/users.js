@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const addressSchema = new mongoose.Schema({
   houseNumber: {
@@ -52,4 +52,4 @@ userSchema.pre('save', function (next) {
 
 const User = mongoose.model("User", userSchema);
 
-module.exports = User;
+export default User;

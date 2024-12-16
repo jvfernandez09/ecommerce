@@ -1,6 +1,7 @@
-const bcrypt = require("bcrypt");
-const User = require("../../model/users");
-const jwt = require("jsonwebtoken");
+import User from '../../model/users.js';
+import { withAuth } from '../../util/withAuth.js';
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
 const resolvers = {
   Mutation: {
@@ -8,7 +9,6 @@ const resolvers = {
       _,
       { firstName, middleName, lastName, email, password, role, address }
     ) => {
-      console.log(firstName)
       // Check if user already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
@@ -76,7 +76,7 @@ const resolvers = {
       }
     },
 
-    createUser: async (
+    createUser: withAuth(async (
       _,
       { firstName, middleName, lastName, email, password, address, role }
     ) => {
@@ -111,9 +111,9 @@ const resolvers = {
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
 
-    updateUser: async (
+    updateUser: withAuth(async (
       _,
       { id, firstName, middleName, lastName, email, password, address, role }
     ) => {
@@ -146,9 +146,9 @@ const resolvers = {
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
 
-    deleteUser: async (_, { id }) => {
+    deleteUser: withAuth(async (_, { id }) => {
       try {
         const deletedUser = await User.findByIdAndDelete(id).select("-password");
         if (!deletedUser) throw new Error("User not found");
@@ -156,11 +156,11 @@ const resolvers = {
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
   },
 
   Query: {
-    getUser: async (_, { id }) => {
+    getUser: withAuth(async (_, { id }) => {
       try {
         const user = await User.findById(id).select("-password"); // Exclude password field
         if (!user) throw new Error("User not found");
@@ -168,16 +168,16 @@ const resolvers = {
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
 
-    getUsers: async () => {
+    getUsers: withAuth(async () => {
       try {
         return await User.find().select("-password"); // Exclude password field for all users
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
   },
 }; 
 
-module.exports = resolvers;
+export default resolvers;

@@ -1,4 +1,4 @@
-const { buildSchema } = require("graphql");
+import { buildSchema } from "graphql";
 
 const userSchema = buildSchema(`
   type Address {
@@ -78,4 +78,4 @@ const userSchema = buildSchema(`
   }
 `);
 
-module.exports = userSchema;
+export default userSchema;

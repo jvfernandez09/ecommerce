@@ -1,9 +1,10 @@
-const Product = require('../../model/products');
+import { withAuth } from '../../util/withAuth.js';
+import Product from '../../model/products.js';
 
 const resolvers = {
   // Query Resolvers
   Query: {
-    getProduct: async (_, { id }) => {
+    getProduct: withAuth(async (_, { id }) => {
       try {
         const product = await Product.findById(id);
         if (!product) throw new Error('Product not found');
@@ -11,14 +12,17 @@ const resolvers = {
       } catch (error) {
         throw new Error(error.message);
       }
-    },
-    getProducts: async () => {
+    }),
+    getProducts: withAuth(async (_, __, context) => {
       try {
+        if (!context.user) {
+          throw new Error('Unauthorized');
+        }
         return await Product.find();
       } catch (error) {
         throw new Error(error.message);
       }
-    },
+    }),
   },
 
   // Mutation Resolvers
@@ -52,4 +56,4 @@ const resolvers = {
   },
 };
 
-module.exports = resolvers;
+export default resolvers;

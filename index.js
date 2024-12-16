@@ -1,16 +1,26 @@
-const express = require('express');
-const { createHandler } = require("graphql-http/lib/use/express");
-const mongoose = require("mongoose");
-const { ruruHTML } = require("ruru/server");
-const { makeExecutableSchema } = require('@graphql-tools/schema');
-const { stitchSchemas } = require('@graphql-tools/stitch');
-require('dotenv').config();
+import express from 'express';
+import { createHandler } from "graphql-http/lib/use/express";
+import mongoose from "mongoose";
+import { ruruHTML } from "ruru/server";
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { stitchSchemas } from '@graphql-tools/stitch';
+import jwt from "jsonwebtoken";
+import cors from 'cors';
+import dotenv from 'dotenv';
+
+// Load environment variables
+dotenv.config();
+
+// CORS Options
+const corsOptions = {
+  allowedHeaders: ['Authorization'],
+};
 
 // Import your individual schemas and resolvers
-const userSchema = require('./graphql/User/Schema');
-const productSchema = require('./graphql/Product/Schema');
-const userResolvers = require('./graphql/User/Resolvers');
-const productResolvers = require('./graphql/Product/Resolvers');
+import userSchema from './graphql/User/Schema.js';
+import productSchema from './graphql/Product/Schema.js';
+import userResolvers from './graphql/User/Resolvers.js';
+import productResolvers from './graphql/Product/Resolvers.js';
 
 // Create executable schemas for both User and Product
 const userExecutableSchema = makeExecutableSchema({
@@ -39,11 +49,29 @@ mongoose.connection.once("open", () => {
 
 // Set up the Express server
 const app = express();
+app.use(cors(corsOptions));
+app.use(express.json());
 
-// Use the stitched schema for the /graphql endpoint
-app.use('/graphql', createHandler({
-  schema: stitchedSchema,
-}));
+app.use(
+  '/graphql',
+  createHandler({
+    schema: stitchedSchema,
+    context: async (req) => {
+      if (req?.headers?.authorization) {
+        const token = req.headers.authorization.replace('Bearer ', '');
+        try {
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          return { user: decoded };
+        } catch (error) {
+          console.error('Error verifying token:', error.message);
+        }
+      }
+
+      return { user: null }
+    },
+  })
+);
+
 
 // Serve the GraphiQL IDE at root
 app.get("/", (_req, res) => {
