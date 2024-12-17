@@ -19,10 +19,14 @@ const corsOptions = {
 // Import your individual schemas and resolvers
 import userSchema from './graphql/User/Schema.js';
 import productSchema from './graphql/Product/Schema.js';
+import reviewSchema from './graphql/Review/Schema.js';
+
 import userResolvers from './graphql/User/Resolvers.js';
 import productResolvers from './graphql/Product/Resolvers.js';
+import reviewResolvers from './graphql/Review/Resolvers.js';
 
 // Create executable schemas for both User and Product
+
 const userExecutableSchema = makeExecutableSchema({
   typeDefs: userSchema,
   resolvers: userResolvers
@@ -33,11 +37,17 @@ const productExecutableSchema = makeExecutableSchema({
   resolvers: productResolvers
 });
 
+const reviewExecutableSchema = makeExecutableSchema({
+  typeDefs: reviewSchema,
+  resolvers: reviewResolvers
+})
+
 // Stitch the schemas
 const stitchedSchema = stitchSchemas({
   subschemas: [
     { schema: userExecutableSchema },
-    { schema: productExecutableSchema }
+    { schema: productExecutableSchema },
+    { schema: reviewExecutableSchema }
   ]
 });
 

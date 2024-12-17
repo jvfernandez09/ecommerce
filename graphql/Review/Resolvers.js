@@ -1,4 +1,4 @@
-import Review from '../../model/review.js';
+import Review from '../../model/reviews.js';
 import { withAuth } from '../../util/withAuth.js';
 
 const resolvers = {

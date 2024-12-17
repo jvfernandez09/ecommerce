@@ -1,33 +1,39 @@
-const { buildSchema } = require("graphql");
+import mongoose from 'mongoose';
 
-// Define the GraphQL schema for product reviews using buildSchema
-const schema = buildSchema(`
-  type Review {
-    id: ID!
-    productId: ID!
-    userId: ID!
-    rating: Int!
-    comment: String!
-    createdAt: String
-    updatedAt: String
-  }
+const { Schema } = mongoose;
 
-  input ReviewInput {
-    productId: ID!
-    rating: Int!
-    comment: String!
-  }
+const reviewSchema = new Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product',
+      required: true,
+    },
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+    },
+    rating: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5,
+    },
+    comment: {
+      type: String,
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
 
-  type Mutation {
-    addReview(input: ReviewInput!): Review!
-    updateReview(id: ID!, input: ReviewInput!): Review!
-    deleteReview(id: ID!): Review!
-  }
+reviewSchema.pre("save", function (next) {
+  this.updatedAt = Date.now();
+  next();
+});
 
-  type Query {
-    getProductReviews(productId: ID!): [Review]
-    getUserReviews(userId: ID!): [Review]
-  }
-`);
+// Create a model for Review
+const Review = mongoose.model('Review', reviewSchema);
 
-module.exports = schema;
+export default Review;
